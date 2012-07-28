@@ -25,7 +25,6 @@ def copy_files(dest_path)
     %x{rsync -ax --exclude .git . "#{dest_path}"}
   rescue IOError
     puts "Not able to copy files!"
-    System.exit(1)
   end
 end
 
@@ -46,7 +45,6 @@ begin
   %x{mkdir "#{dest_path}"}
 rescue Error
   puts "Cant't create new directory!"
-  System.exit(1)
 end
 
 # Change to old dir, copy files to new one
