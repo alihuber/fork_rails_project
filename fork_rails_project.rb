@@ -45,7 +45,7 @@ dest_path = base_dir_path + "/" + dest_proj
 begin
   %x{mkdir "#{dest_path}"}
 rescue Error
-  puts "Cant't create new rails project!"
+  puts "Cant't create new directory!"
   System.exit(1)
 end
 
