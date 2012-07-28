@@ -1,4 +1,4 @@
-#!/home/ali/.rvm/rubies/ruby-1.9.3-p194/bin/ruby
+#!/usr/bin/ruby
 require 'active_support/all'
 
 # Read in two application folders.
@@ -43,7 +43,6 @@ dest_path = base_dir_path + "/" + dest_proj
 
 # Create a new source dir
 begin
-  # %x{rails new "#{dest_proj}"}
   %x{mkdir "#{dest_path}"}
 rescue Error
   puts "Cant't create new rails project!"
