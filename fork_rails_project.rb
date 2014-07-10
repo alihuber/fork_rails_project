@@ -1,10 +1,10 @@
 #!/usr/bin/ruby
-require 'active_support/all'
+require "active_support/all"
 
 # Read in two application folders.
 # If not exactly 2 given, raise an error
 # Does no checks for valid rails project names whatsoever
-raise ArgumentError, 'Wrong number of arguments (must be 2 project folders)' if ARGV.size != 2
+raise ArgumentError, "Wrong number of arguments (must be 2 project folders)" if ARGV.size != 2
 source_proj = ARGV[0].dup
 dest_proj = ARGV[1].dup
 args = []
@@ -24,7 +24,7 @@ def copy_files(dest_path)
   begin
     %x{rsync -ax --exclude .git . "#{dest_path}"}
   rescue IOError
-    puts "Not able to copy files!"
+    puts "Unable to copy files!"
   end
 end
 
@@ -58,20 +58,12 @@ old_app_name = source_proj.camelize
 new_app_name = dest_proj.camelize
 
 # Get string with all occurences of the old project name in the new project files
-occurences = %x{grep -iR "#{old_app_name}" ./}
+occurences = %x{grep -iR "#{old_app_name}" --exclude-dir=log --exclude-dir=tmp --exclude=tags .}
 
-# Gives us something like this:
-# "./config/application.rb:module SampleApp\n
-# ./config/environment.rb:SampleApp::Application.initialize!\n
-# ./config/environments/development.rb:SampleApp::Application.configure do\n
-# ./config/environments/production.rb:SampleApp::Application.configure do\n
-# ./config/environments/test.rb:SampleApp::Application.configure do\n
-# ./config/initializers/secret_token.rb:SampleApp::Application.config.secret_token = '7f7309bf1d1684eb605522ff541ce6e85934303ca23d1224c8cf2a5d15b6cc33bdb85ffc0a1dacf473e220a58fbc3da1133ea66069aceccf19d8877f76fad656'\n
-# ./config/initializers/session_store.rb:SampleApp::Application.config.session_store :cookie_store, key: '_sample_app_session'\n
-# ./config/initializers/session_store.rb:# SampleApp::Application.config.session_store :active_record_store\n
-# ./config/routes.rb:SampleApp::Application.routes.draw do\n
-# ./config.ru:run SampleApp::Application\n
-# ./Rakefile:SampleApp::Application.load_tasks\n"
+# occurences will be something like this. Thanks to Rails 4 namespacing,
+# several configs, initializers and the router have not be altered:
+# ./app/views/layouts/application.html.haml:      SampleApp
+# ./config/application.rb:module SampleApp
 
 occurences = occurences.split("\n")
 
@@ -93,4 +85,9 @@ begin
   end
 rescue IOError
   puts "Unable to alter new files!"
+end
+
+puts "Finished without errors. Altered files:"
+files.each do |filename|
+  puts filename
 end
