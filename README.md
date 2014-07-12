@@ -20,11 +20,12 @@ Suggest you are in the directory with your rails apps:
 Now you get a copy (with the .git-dir omitted) of old_app, and a new app already set up
 to work, meaning that all occurences of the OldApp namespace-stuff was replaced with NewApp.
 
+This also works with engine folders, all relevant files will be automatically altered/renamed.
+
 Requirements
 -----------
-An OS with access to the `rsync` and `grep` utilities. Also make sure you can require the activesupport gem, because the script uses the `camelize` method.
+An OS with access to the `rsync`, `grep` and `mv` utilities. Also make sure you can require the activesupport gem, because the script uses the `camelize` method.
 
-To-Dos
+ToDo
 ------
-* Make sure this works with engines
-* Add more options, e.g. which folders will be ignored
+* Add more options, e.g. which folders will be ignored (in calse you want to move the .git directory as well)
