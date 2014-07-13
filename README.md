@@ -29,3 +29,4 @@ An OS with access to the `rsync`, `grep` and `mv` utilities. Also make sure you 
 ToDo
 ------
 * Add more options, e.g. which folders will be ignored (in calse you want to move the .git directory as well)
+* Turn into Ruby gem with binary
