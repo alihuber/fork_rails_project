@@ -4,9 +4,18 @@ require "find"
 # require "pry"
 
 
-def copy_files(dest_path)
+def copy_files(dest_path, ignored_files)
+  copy_string = "rsync -ax "
+  ignored_files.each do |file_name|
+    copy_string << "--exclude #{file_name} "
+  end
+  copy_string << ". #{dest_path}"
   begin
-    %x{rsync -ax --exclude .git . "#{dest_path}"}
+    puts "Copying files from #{Dir.pwd} to #{dest_path}"
+    puts "Ignored files/directories: #{ignored_files.join(' ')}"
+    puts "Executing #{copy_string}"
+    %x[#{copy_string}]
+    puts
   rescue IOError
     puts "Unable to copy files!"
   end
@@ -30,6 +39,7 @@ def rename_file_objects(old_name, new_name)
 end
 
 def substitute_names(old_name, new_name)
+  puts "Replacing string '#{old_name}' in application files..."
   occurrence = %x{grep -iR "#{old_name}" --exclude-dir=log --exclude-dir=tmp --exclude=tags .}
   occurrence = occurrence.split("\n")
   files = []
@@ -57,56 +67,40 @@ def substitute_names(old_name, new_name)
 end
 
 
-# Read in two application folders.
-# If not exactly 2 given, raise an error
-# Does no checks for valid rails project names whatsoever
-raise ArgumentError, "Wrong number of arguments (must be 2 project folders)" if ARGV.size != 2
 source_project_name = ARGV[0].dup
-dest_project_name = ARGV[1].dup
-args = []
-args << source_project_name << dest_project_name
+dest_project_name   = ARGV[1].dup
+folder_names        = []
+folder_names << source_project_name << dest_project_name
 
-# Cut all beginning forward slashes
-args.each do |a|
+folder_names.each do |a|
   a.strip!
   if a.start_with? "/"
     a.slice!(0)
   end
 end
 
-# Is folder args[0] existent/decent directory?
 raise RuntimeError, "#{source_project_name} is not a valid dir!" if !File.directory?("./#{source_project_name}")
-
-# Does the second folder already exist?
 raise RuntimeError, "Destination directory already exists!" if File.directory?("./#{dest_project_name}")
 
-# Get the base and later working direcotry for future reference
-base_dir_path = Dir.pwd
-dest_path = base_dir_path + "/" + dest_project_name
+base_dir_path   = Dir.pwd
+dest_path       = base_dir_path + "/" + dest_project_name
+ignored_files = ARGV[2..-1]
 
-
-# Create a new source dir
 begin
   %x{mkdir "#{dest_path}"}
 rescue Error
   puts "Cant't create new directory!"
 end
 
-# Change to old dir, copy files to new one
 Dir.chdir(base_dir_path + "/" + source_project_name)
-copy_files(dest_path)
-
-# Change to new dir
+copy_files(dest_path, ignored_files)
 Dir.chdir(dest_path)
 
 old_app_name = source_project_name.camelize
 new_app_name = dest_project_name.camelize
 
-# Are we inside an engine? If so, whe have to alter more files...
+# Are we inside an engine? If so, we have to rename some files and folders
 if File.exists?("lib/#{source_project_name}/engine.rb")
-  substitute_names(source_project_name, dest_project_name)
-  puts
-
   rename_file_objects(source_project_name, dest_project_name) do |old_paths|
     old_paths.keep_if { |path| File.directory?(path) }
   end
@@ -115,4 +109,6 @@ if File.exists?("lib/#{source_project_name}/engine.rb")
   puts
 end
 
+substitute_names(source_project_name, dest_project_name)
+puts
 substitute_names(old_app_name, new_app_name)
