@@ -3,7 +3,7 @@ $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
   s.name         = "fork_rails_project"
-  s.version      = "0.0.1"
+  s.version      = "0.0.2"
   s.authors      = "Alexander Huber"
   s.email        = "alih83@gmx.de"
   s.homepage     = "https://github.com/alihuber/fork_rails_project"
@@ -15,5 +15,7 @@ Gem::Specification.new do |s|
   s.require_path = "lib"
   s.license      = "MIT"
 
-  s.add_runtime_dependency "activesupport", "~> 4"
+  s.add_runtime_dependency     "activesupport", "~> 4"
+  s.add_development_dependency "rspec"
+  s.add_development_dependency "pry"
 end
