@@ -4,6 +4,7 @@ require "active_support/all"
 require "find"
 require "forker"
 require "pry"
+require "forker_examples"
 
 describe ForkRailsProject::Forker do
 
@@ -21,7 +22,12 @@ describe ForkRailsProject::Forker do
     expect(File.directory?("../forked_app")).to be_truthy
   end
 
-  describe "normal projekt fork with no ignored files" do
+
+  describe "normal project fork with no ignored files" do
+    let(:forker) { described_class.new("orig_app", "forked_app") }
+
+    it_behaves_like :copying_files_and_altering_strings
+
     it "does copy all files" do
       Dir.chdir("./orig_app")
       count_before = Dir["**/*"].length
@@ -32,53 +38,41 @@ describe ForkRailsProject::Forker do
       count_after = Dir["**/*"].length
       expect(count_before).to eql count_after
     end
+  end
 
-    it "does remove all snake_cased occurrences of original app name in forked app" do
+
+  describe "normal project fork with ignored files" do
+    let(:forker) { described_class.new("orig_app", "forked_app", ["ignore.me"]) }
+
+    it_behaves_like :copying_files_and_altering_strings
+
+    it "does not copy ignored files" do
+      Dir.chdir("./orig_app")
+      count_before = Dir["**/*"].length
+      Dir.chdir("../")
       forker.fork!
-      Dir.chdir("../forked_app")
-      files = Dir.glob("**/*")
-      file_contents = ""
-      files.each do |file|
-        File.open(file) { |f| file_contents << f.read unless File.directory?(f) }
-      end
 
-      expect(file_contents.include?("orig_app")).to be_falsey
+      Dir.chdir("../forked_app")
+      count_after = Dir["**/*"].length
+      expect(count_after).to eql count_before - 1
     end
+  end
 
-    it "does remove all CamelCased occurrences of original app name in forked app" do
+
+  describe "normal project fork with ignored files and folders" do
+    let(:forker) { described_class.new("orig_app", "forked_app", ["ignore.me", "tmp"]) }
+
+    it_behaves_like :copying_files_and_altering_strings
+
+    it "does not copy ignored files and folders" do
+      Dir.chdir("./orig_app")
+      count_before = Dir["**/*"].length
+      Dir.chdir("../")
       forker.fork!
+
       Dir.chdir("../forked_app")
-      files = Dir.glob("**/*")
-      file_contents = ""
-      files.each do |file|
-        File.open(file) { |f| file_contents << f.read unless File.directory?(f) }
-      end
-
-      expect(file_contents.include?("OrigApp")).to be_falsey
-    end
-
-    it "does rename all snake_cased occurrences of original app name in forked app" do
-      forker.fork!
-      Dir.chdir("../forked_app")
-      files = Dir.glob("**/*")
-      file_contents = ""
-      files.each do |file|
-        File.open(file) { |f| file_contents << f.read unless File.directory?(f) }
-      end
-
-      expect(file_contents.scan(/forked_app/).length).to eq 1
-    end
-
-    it "does rename all CamelCased occurrences of original app name in forked app" do
-      forker.fork!
-      Dir.chdir("../forked_app")
-      files = Dir.glob("**/*")
-      file_contents = ""
-      files.each do |file|
-        File.open(file) { |f| file_contents << f.read unless File.directory?(f) }
-      end
-
-      expect(file_contents.scan(/ForkedApp/).length).to eq 2
+      count_after = Dir["**/*"].length
+      expect(count_after).to eql count_before - 3
     end
   end
 end
