@@ -1,4 +1,5 @@
 require "active_support/all"
+require "open3"
 require "find"
 
 module ForkRailsProject
@@ -36,16 +37,17 @@ module ForkRailsProject
       end
       files_to_move.each do |old, new|
         puts "Renaming #{old}  ->  #{new}"
-        `mv #{old} #{new}`
+        # we don't want 'no such file' output for duplicate paths
+        stdin, stdout, stderr = Open3.popen3("mv #{old} #{new}")
       end
     end
 
     def substitute_names(old_name, new_name)
       puts "Replacing string '#{old_name}' in application files..."
-      occurrence = %x{grep -iR "#{old_name}" --exclude-dir=log --exclude-dir=tmp --exclude=tags .}
-      occurrence = occurrence.split("\n")
+      occurrences = %x{grep -iR "#{old_name}" --exclude-dir=log --exclude-dir=tmp --exclude=tags .}
+      occurrences = occurrences.split("\n")
       files = []
-      occurrence.each do |occ|
+      occurrences.each do |occ|
         occ.slice!(0..1)
         file_name = occ.slice(0...occ.index(":"))
         files << file_name
@@ -110,18 +112,22 @@ module ForkRailsProject
       old_app_name = @source_project_name.camelize
       new_app_name = @dest_project_name.camelize
 
-      # Are we inside an engine? If so, we have to rename some files and folders
+      # Are we inside an engine? If so, we have to rename some files and folders:
       if File.exists?("lib/#{@source_project_name}/engine.rb")
+        # first step: copy and rename directories
         rename_file_objects(@source_project_name, @dest_project_name) do |old_paths|
           old_paths.keep_if { |path| File.directory?(path) }
         end
 
+        # called without above block: copy and rename files in engine
         rename_file_objects(@source_project_name, @dest_project_name)
         puts
       end
 
+      # alter snake_cased strings
       substitute_names(@source_project_name, dest_project_name)
       puts
+      # alter CamelCased strings
       substitute_names(old_app_name, new_app_name)
     end
   end

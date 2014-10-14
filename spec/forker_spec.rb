@@ -16,7 +16,7 @@ describe ForkRailsProject::Forker do
   let(:forker) { described_class.new("orig_app", "forked_app") }
 
   it "does create a new directory with the given name" do
-    Dir.chdir("./spec/test/")
+    Dir.chdir("./spec/test_folders/")
     forker.fork!
     # forker switches to folder to fork
     expect(File.directory?("../forked_app")).to be_truthy
@@ -26,7 +26,8 @@ describe ForkRailsProject::Forker do
   describe "normal project fork with no ignored files" do
     let(:forker) { described_class.new("orig_app", "forked_app") }
 
-    it_behaves_like :copying_files_and_altering_strings
+    it_behaves_like :moving_basic_files
+    it_behaves_like :moving_files_in_normal_app
 
     it "does copy all files" do
       Dir.chdir("./orig_app")
@@ -44,7 +45,8 @@ describe ForkRailsProject::Forker do
   describe "normal project fork with ignored files" do
     let(:forker) { described_class.new("orig_app", "forked_app", ["ignore.me"]) }
 
-    it_behaves_like :copying_files_and_altering_strings
+    it_behaves_like :moving_basic_files
+    it_behaves_like :moving_files_in_normal_app
 
     it "does not copy ignored files" do
       Dir.chdir("./orig_app")
@@ -62,7 +64,8 @@ describe ForkRailsProject::Forker do
   describe "normal project fork with ignored files and folders" do
     let(:forker) { described_class.new("orig_app", "forked_app", ["ignore.me", "tmp"]) }
 
-    it_behaves_like :copying_files_and_altering_strings
+    it_behaves_like :moving_basic_files
+    it_behaves_like :moving_files_in_normal_app
 
     it "does not copy ignored files and folders" do
       Dir.chdir("./orig_app")
@@ -74,6 +77,16 @@ describe ForkRailsProject::Forker do
       count_after = Dir["**/*"].length
       expect(count_after).to eql count_before - 3
     end
+  end
+
+  describe "engine fork with no ignored files" do
+    let(:forker) { described_class.new("orig_engine", "forked_app") }
+
+    # if focus
+    # Dir.chdir("./spec/test_folders/")
+    it_behaves_like :moving_basic_files
+    it_behaves_like :moving_files_in_engine
+
   end
 end
 
