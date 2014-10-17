@@ -82,11 +82,9 @@ describe ForkRailsProject::Forker do
   describe "engine fork with no ignored files" do
     let(:forker) { described_class.new("orig_engine", "forked_app") }
 
-    # if focus
-    # Dir.chdir("./spec/test_folders/")
     it_behaves_like :moving_basic_files
     it_behaves_like :moving_files_in_engine
-
+    it_behaves_like :renaming_file_objects_in_engine
   end
 end
 
