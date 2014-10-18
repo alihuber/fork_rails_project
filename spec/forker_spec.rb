@@ -124,5 +124,19 @@ describe ForkRailsProject::Forker do
       expect(count_after).to eql count_before - 3
     end
   end
+
+  # test only applicable if grep output does not match './file_path: occurrence'
+  # describe "flawed grep output" do
+  #   Dir.chdir("./spec/test_folders/")
+  #   let(:forker) { described_class.new("orig_app", "forked_app") }
+  #   subject { forker.fork! }
+
+  #   # tested with e.g. 'grep -rli'
+  #   fit "does not raise an error" do
+  #     expect {
+  #       subject
+  #     }.not_to raise_error
+  #   end
+  # end
 end
 

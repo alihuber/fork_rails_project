@@ -29,6 +29,44 @@ module ForkRailsProject
       end
     end
 
+    def fork!
+      base_dir_path = Dir.pwd
+      dest_path     = [base_dir_path, "/", @dest_project_name].join
+
+      begin
+        %x[mkdir "#{dest_path}"]
+      rescue Error
+        puts "Cant't create new directory!"
+      end
+
+      Dir.chdir([base_dir_path, "/", @source_project_name].join)
+      copy_files(dest_path, @ignored_files)
+      Dir.chdir(dest_path)
+
+      old_app_name = @source_project_name.camelize
+      new_app_name = @dest_project_name.camelize
+
+      # Are we inside an engine? If so, we have to rename some files and folders:
+      if File.exists?("lib/#{@source_project_name}/engine.rb")
+        # first step: copy and rename directories
+        rename_file_objects(@source_project_name, @dest_project_name) do |old_paths|
+          old_paths.keep_if { |path| File.directory?(path) }
+        end
+
+        # called without above block: copy and rename files in engine
+        rename_file_objects(@source_project_name, @dest_project_name)
+        puts
+      end
+
+      # alter snake_cased strings
+      substitute_names(@source_project_name, dest_project_name)
+      puts
+      # alter CamelCased strings
+      substitute_names(old_app_name, new_app_name)
+    end
+
+    private
+
     def copy_files(dest_path, ignored_files)
       copy_string = "rsync -ax "
       ignored_files.each do |file_name|
@@ -69,14 +107,16 @@ module ForkRailsProject
       occurrences = occurrences.split("\n")
       files = occurrences.each.flat_map do |occ|
         occ.slice!(0..1)
-        occ.slice(0...occ.index(":"))
-      end.uniq
+        occ.slice(0...occ.index(":")) if occ.include?(":")
+      end.uniq.compact
 
       begin
         files.each do |file|
-          text = File.read(file)
-          text = text.gsub(old_name, new_name)
-          File.open(file, "w+") { |line| line.puts text }
+          if File.exist?(file)
+            text = File.read(file)
+            text = text.gsub(old_name, new_name)
+            File.open(file, "w+") { |line| line.puts text }
+          end
         end
       rescue IOError
         puts "Unable to alter new files!"
@@ -87,42 +127,6 @@ module ForkRailsProject
       files.each do |filename|
         puts filename
       end
-    end
-
-    def fork!
-      base_dir_path = Dir.pwd
-      dest_path     = [base_dir_path, "/", @dest_project_name].join
-
-      begin
-        %x[mkdir "#{dest_path}"]
-      rescue Error
-        puts "Cant't create new directory!"
-      end
-
-      Dir.chdir([base_dir_path, "/", @source_project_name].join)
-      copy_files(dest_path, @ignored_files)
-      Dir.chdir(dest_path)
-
-      old_app_name = @source_project_name.camelize
-      new_app_name = @dest_project_name.camelize
-
-      # Are we inside an engine? If so, we have to rename some files and folders:
-      if File.exists?("lib/#{@source_project_name}/engine.rb")
-        # first step: copy and rename directories
-        rename_file_objects(@source_project_name, @dest_project_name) do |old_paths|
-          old_paths.keep_if { |path| File.directory?(path) }
-        end
-
-        # called without above block: copy and rename files in engine
-        rename_file_objects(@source_project_name, @dest_project_name)
-        puts
-      end
-
-      # alter snake_cased strings
-      substitute_names(@source_project_name, dest_project_name)
-      puts
-      # alter CamelCased strings
-      substitute_names(old_app_name, new_app_name)
     end
   end
 end
