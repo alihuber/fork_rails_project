@@ -1,7 +1,5 @@
 require "spec_helper"
 require "fileutils"
-require "active_support/all"
-require "find"
 require "forker"
 require "pry"
 require "forker_examples"
@@ -85,6 +83,46 @@ describe ForkRailsProject::Forker do
     it_behaves_like :moving_basic_files
     it_behaves_like :moving_files_in_engine
     it_behaves_like :renaming_file_objects_in_engine
+  end
+
+  describe "engine fork with ignored files" do
+    let(:forker) { described_class.new("orig_engine", "forked_app", ["ignore.me"]) }
+
+    it_behaves_like :moving_basic_files
+    it_behaves_like :moving_files_in_engine
+    it_behaves_like :renaming_file_objects_in_engine
+
+    it "does not copy ignored files" do
+      Dir.chdir("./orig_engine")
+      count_before = Dir["**/*"].length
+      Dir.chdir("../")
+      forker.fork!
+
+      Dir.chdir("../forked_app")
+      count_after = Dir["**/*"].length
+      expect(count_after).to eql count_before - 1
+    end
+  end
+
+  describe "engine fork with ignored files and folders" do
+    let(:forker) { described_class.new("orig_engine", "forked_app", ["ignore.me", "tmp"]) }
+
+    # if focus
+    # Dir.chdir("./spec/test_folders/")
+    it_behaves_like :moving_basic_files
+    it_behaves_like :moving_files_in_engine
+    it_behaves_like :renaming_file_objects_in_engine
+
+    it "does not copy ignored files and folders" do
+      Dir.chdir("./orig_engine")
+      count_before = Dir["**/*"].length
+      Dir.chdir("../")
+      forker.fork!
+
+      Dir.chdir("../forked_app")
+      count_after = Dir["**/*"].length
+      expect(count_after).to eql count_before - 3
+    end
   end
 end
 
