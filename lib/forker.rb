@@ -7,6 +7,28 @@ module ForkRailsProject
 
     attr_accessor :source_project_name, :dest_project_name, :ignored_files
 
+    def initialize(source_project_name, dest_project_name, ignored_files = [])
+      @source_project_name = source_project_name
+      @dest_project_name   = dest_project_name
+      @ignored_files       = ignored_files
+      folder_names = [] << @source_project_name << @dest_project_name
+
+      folder_names.each do |a|
+        a.strip!
+        if a.start_with?("/")
+          a.slice!(0)
+        end
+      end
+
+      if !File.directory?("./#{@source_project_name}")
+        raise RuntimeError, "#{@source_project_name} is not a valid dir!"
+      end
+
+      if File.directory?("./#{@dest_project_name}")
+        raise RuntimeError, "Destination directory already exists!"
+      end
+    end
+
     def copy_files(dest_path, ignored_files)
       copy_string = "rsync -ax "
       ignored_files.each do |file_name|
@@ -25,15 +47,14 @@ module ForkRailsProject
     end
 
     def rename_file_objects(old_name, new_name)
-      old_file_paths = []
-      Find.find(".") do |path|
-        old_file_paths << path if path =~ /#{old_name}/
-      end
+      old_file_paths = Find.find(".").flat_map do |path|
+        path if path =~ /#{old_name}/
+      end.compact
       old_file_paths = yield(old_file_paths) if block_given?
-      files_to_move = Hash.new
-      old_file_paths.each do |path|
+      files_to_move  = old_file_paths.inject({}) do |hash, path|
         new_path = path.gsub(/#{old_name}/, new_name)
-        files_to_move[path] = new_path
+        hash[path] = new_path
+        hash
       end
       files_to_move.each do |old, new|
         puts "Renaming #{old}  ->  #{new}"
@@ -44,15 +65,12 @@ module ForkRailsProject
 
     def substitute_names(old_name, new_name)
       puts "Replacing string '#{old_name}' in application files..."
-      occurrences = %x{grep -iR "#{old_name}" --exclude-dir=log --exclude-dir=tmp --exclude=tags .}
+      occurrences = %x[grep -iR "#{old_name}" --exclude-dir=log --exclude-dir=tmp --exclude=tags .]
       occurrences = occurrences.split("\n")
-      files = []
-      occurrences.each do |occ|
+      files = occurrences.each.flat_map do |occ|
         occ.slice!(0..1)
-        file_name = occ.slice(0...occ.index(":"))
-        files << file_name
-      end
-      files.uniq!
+        occ.slice(0...occ.index(":"))
+      end.uniq
 
       begin
         files.each do |file|
@@ -71,41 +89,17 @@ module ForkRailsProject
       end
     end
 
-
-    def initialize(source_project_name, dest_project_name, ignored_files = [])
-      @source_project_name = source_project_name
-      @dest_project_name   = dest_project_name
-      @ignored_files       = ignored_files
-      folder_names = []
-      folder_names << @source_project_name << @dest_project_name
-
-      folder_names.each do |a|
-        a.strip!
-        if a.start_with? "/"
-          a.slice!(0)
-        end
-      end
-
-      if !File.directory?("./#{@source_project_name}")
-        raise RuntimeError, "#{@source_project_name} is not a valid dir!"
-      end
-
-      if File.directory?("./#{@dest_project_name}")
-        raise RuntimeError, "Destination directory already exists!"
-      end
-    end
-
     def fork!
-      base_dir_path   = Dir.pwd
-      dest_path       = base_dir_path + "/" + @dest_project_name
+      base_dir_path = Dir.pwd
+      dest_path     = [base_dir_path, "/", @dest_project_name].join
 
       begin
-        %x{mkdir "#{dest_path}"}
+        %x[mkdir "#{dest_path}"]
       rescue Error
         puts "Cant't create new directory!"
       end
 
-      Dir.chdir(base_dir_path + "/" + @source_project_name)
+      Dir.chdir([base_dir_path, "/", @source_project_name].join)
       copy_files(dest_path, @ignored_files)
       Dir.chdir(dest_path)
 
