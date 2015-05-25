@@ -41,7 +41,9 @@ describe ForkRailsProject::Forker do
 
 
   describe "normal project fork with ignored files" do
-    let(:forker) { described_class.new("orig_app", "forked_app", ["ignore.me"]) }
+    let(:forker) do
+      described_class.new("orig_app", "forked_app", ["ignore.me"])
+    end
 
     it_behaves_like :moving_basic_files
     it_behaves_like :moving_files_in_normal_app
@@ -60,7 +62,9 @@ describe ForkRailsProject::Forker do
 
 
   describe "normal project fork with ignored files and folders" do
-    let(:forker) { described_class.new("orig_app", "forked_app", ["ignore.me", "tmp"]) }
+    let(:forker) do
+      described_class.new("orig_app", "forked_app", ["ignore.me", "tmp"])
+    end
 
     it_behaves_like :moving_basic_files
     it_behaves_like :moving_files_in_normal_app
@@ -86,7 +90,9 @@ describe ForkRailsProject::Forker do
   end
 
   describe "engine fork with ignored files" do
-    let(:forker) { described_class.new("orig_engine", "forked_app", ["ignore.me"]) }
+    let(:forker) do
+      described_class.new("orig_engine", "forked_app", ["ignore.me"])
+    end
 
     it_behaves_like :moving_basic_files
     it_behaves_like :moving_files_in_engine
@@ -105,7 +111,9 @@ describe ForkRailsProject::Forker do
   end
 
   describe "engine fork with ignored files and folders" do
-    let(:forker) { described_class.new("orig_engine", "forked_app", ["ignore.me", "tmp"]) }
+    let(:forker) do
+      described_class.new("orig_engine", "forked_app", ["ignore.me", "tmp"])
+    end
 
     # if focus
     # Dir.chdir("./spec/test_folders/")
@@ -139,4 +147,3 @@ describe ForkRailsProject::Forker do
   #   end
   # end
 end
-

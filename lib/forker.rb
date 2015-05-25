@@ -11,7 +11,7 @@ module ForkRailsProject
       @source_project_name = source_project_name
       @dest_project_name   = dest_project_name
       @ignored_files       = ignored_files
-      folder_names = [] << @source_project_name << @dest_project_name
+      folder_names         = [] << @source_project_name << @dest_project_name
 
       folder_names.each do |a|
         a.strip!
@@ -46,10 +46,12 @@ module ForkRailsProject
       old_app_name = @source_project_name.camelize
       new_app_name = @dest_project_name.camelize
 
-      # Are we inside an engine? If so, we have to rename some files and folders:
+      # Are we inside an engine?
+      # If so, we have to rename some files and folders:
       if File.exists?("lib/#{@source_project_name}/engine.rb")
         # first step: copy and rename directories
-        rename_file_objects(@source_project_name, @dest_project_name) do |old_paths|
+        rename_file_objects(@source_project_name,
+                            @dest_project_name) do |old_paths|
           old_paths.keep_if { |path| File.directory?(path) }
         end
 
@@ -90,8 +92,8 @@ module ForkRailsProject
       end.compact
       old_file_paths = yield(old_file_paths) if block_given?
       files_to_move  = old_file_paths.inject({}) do |hash, path|
-        new_path = path.gsub(/#{old_name}/, new_name)
-        hash[path] = new_path
+        new_path     = path.gsub(/#{old_name}/, new_name)
+        hash[path]   = new_path
         hash
       end
       files_to_move.each do |old, new|
@@ -103,7 +105,11 @@ module ForkRailsProject
 
     def substitute_names(old_name, new_name)
       puts "Replacing string '#{old_name}' in application files..."
-      occurrences = %x[grep -iR "#{old_name}" --exclude-dir=log --exclude-dir=tmp --exclude=tags .]
+      command     = "grep -iR "\
+                    "#{old_name} "\
+                    "--exclude-dir=log --exclude-dir=tmp "\
+                    "--exclude=tags .".squish
+      occurrences = %x[#{command}]
       occurrences = occurrences.split("\n")
       files = occurrences.each.flat_map do |occ|
         occ.slice!(0..1)
@@ -122,12 +128,11 @@ module ForkRailsProject
         puts "Unable to alter new files!"
       end
 
-      puts "Finished replacing string '#{old_name}' in application files."\
-        " Altered files:"
+      puts "Finished replacing string '#{old_name}' in application files. "\
+           "Altered files:"
       files.each do |filename|
         puts filename
       end
     end
   end
 end
-
