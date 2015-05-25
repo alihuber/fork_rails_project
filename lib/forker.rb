@@ -13,10 +13,10 @@ module ForkRailsProject
       @ignored_files       = ignored_files
       folder_names         = [] << @source_project_name << @dest_project_name
 
-      folder_names.each do |a|
-        a.strip!
-        if a.start_with?("/")
-          a.slice!(0)
+      folder_names.each do |name|
+        name.strip!
+        if name.start_with?("/")
+          name.slice!(0)
         end
       end
 
