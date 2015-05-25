@@ -1,3 +1,5 @@
+TEST_DIR = Dir.pwd + "/spec/test_folders"
+
 RSpec.configure do |config|
   # uncomment next line for pry output
   config.before(:all) { silence_output }

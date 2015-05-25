@@ -7,14 +7,14 @@ require "forker_examples"
 describe ForkRailsProject::Forker do
 
   after(:each) do
-    Dir.chdir("../")
+    Dir.chdir(TEST_DIR)
     FileUtils.remove_dir("./forked_app") if File.directory?("./forked_app")
   end
 
   let(:forker) { described_class.new("orig_app", "forked_app") }
 
   it "does create a new directory with the given name" do
-    Dir.chdir("./spec/test_folders/")
+    Dir.chdir(TEST_DIR)
     forker.fork!
     # forker switches to folder to fork
     expect(File.directory?("../forked_app")).to be_truthy
@@ -116,7 +116,7 @@ describe ForkRailsProject::Forker do
     end
 
     # if focus
-    # Dir.chdir("./spec/test_folders/")
+    # Dir.chdir(TEST_DIR)
     it_behaves_like :moving_basic_files
     it_behaves_like :moving_files_in_engine
     it_behaves_like :renaming_file_objects_in_engine
@@ -135,7 +135,7 @@ describe ForkRailsProject::Forker do
 
   # test only applicable if grep output does not match './file_path: occurrence'
   # describe "flawed grep output" do
-  #   Dir.chdir("./spec/test_folders/")
+  #   Dir.chdir(TEST_DIR)
   #   let(:forker) { described_class.new("orig_app", "forked_app") }
   #   subject { forker.fork! }
 

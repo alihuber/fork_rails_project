@@ -3,14 +3,7 @@ shared_examples_for :moving_basic_files do
     it "does remove all snake_cased occurrences of original app name "\
        "in forked app" do
       forker.fork!
-      Dir.chdir("../forked_app")
-      files = Dir.glob("**/*")
-      file_contents = ""
-      files.each do |file|
-        File.open(file) do |f|
-          file_contents << f.read unless File.directory?(f)
-        end
-      end
+      file_contents = read_file_contents
 
       expect(file_contents.include?("orig_app")).to be_falsey
     end
@@ -18,14 +11,7 @@ shared_examples_for :moving_basic_files do
     it "does remove all CamelCased occurrences of original app name "\
        "in forked app" do
       forker.fork!
-      Dir.chdir("../forked_app")
-      files = Dir.glob("**/*")
-      file_contents = ""
-      files.each do |file|
-        File.open(file) do |f|
-          file_contents << f.read unless File.directory?(f)
-        end
-      end
+      file_contents = read_file_contents
 
       expect(file_contents.include?("OrigApp")).to be_falsey
     end
