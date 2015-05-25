@@ -19,6 +19,22 @@ def file_count_after
   Dir["**/*"].length
 end
 
+def read_file_contents
+  Dir.chdir(TEST_DIR + "/forked_app")
+  files = Dir.glob("**/*")
+  file_contents = ""
+  files.each do |file|
+    File.open(file) { |f| file_contents << f.read unless File.directory?(f) }
+  end
+  file_contents
+end
+
+def read_file_paths
+  Dir.chdir(TEST_DIR + "/forked_app")
+  Dir.glob("**/*").join(" ")
+end
+
+
 RSpec.configure do |config|
   # uncomment next line for pry output
   config.before(:all) { silence_output }

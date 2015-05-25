@@ -57,6 +57,7 @@ describe ForkRailsProject::Forker do
     end
   end
 
+
   describe "engine fork with no ignored files" do
     let(:forker) { described_class.new("orig_engine", "forked_app") }
 
@@ -64,6 +65,7 @@ describe ForkRailsProject::Forker do
     it_behaves_like :moving_files_in_engine
     it_behaves_like :renaming_file_objects_in_engine
   end
+
 
   describe "engine fork with ignored files" do
     let(:forker) do
@@ -81,6 +83,7 @@ describe ForkRailsProject::Forker do
     end
   end
 
+
   describe "engine fork with ignored files and folders" do
     let(:forker) do
       described_class.new("orig_engine", "forked_app", ["ignore.me", "tmp"])
@@ -97,6 +100,7 @@ describe ForkRailsProject::Forker do
       expect(file_count_after).to eql engine_file_count_before - 3
     end
   end
+
 
   # test only applicable if grep output does not match './file_path: occurrence'
   # describe "flawed grep output" do
