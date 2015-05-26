@@ -46,19 +46,16 @@ module ForkRailsProject
       old_app_name = @source_project_name.camelize
       new_app_name = @dest_project_name.camelize
 
-      # Are we inside an engine?
-      # If so, we have to rename some files and folders:
+      # copy and rename folders and files (in that order) in engine first
       if File.exists?("lib/#{@source_project_name}/engine.rb")
-        # first step: copy and rename directories
-        rename_file_objects(@source_project_name,
-                            @dest_project_name) do |old_paths|
-          old_paths.keep_if { |path| File.directory?(path) }
-        end
-
-        # called without above block: copy and rename files in engine
-        rename_file_objects(@source_project_name, @dest_project_name)
+        copy_and_rename_directories
+        copy_and_rename_files
         puts
       end
+
+      copy_and_rename_directories
+      copy_and_rename_files
+      puts
 
       # alter snake_cased strings
       substitute_names(@source_project_name, dest_project_name)
@@ -68,6 +65,18 @@ module ForkRailsProject
     end
 
     private
+
+    def copy_and_rename_directories
+      rename_file_objects(@source_project_name,
+                          @dest_project_name) do |old_paths|
+        old_paths.keep_if { |path| File.directory?(path) }
+      end
+    end
+
+    def copy_and_rename_files
+      # called without block: only files are copied and renamed, not directories
+      rename_file_objects(@source_project_name, @dest_project_name)
+    end
 
     def copy_files(dest_path, ignored_files)
       copy_string = "rsync -ax "

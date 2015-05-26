@@ -18,8 +18,9 @@ describe ForkRailsProject::Forker do
   describe "normal project fork with no ignored files" do
     let(:forker) { described_class.new("orig_app", "forked_app") }
 
-    it_behaves_like :moving_basic_files
+    it_behaves_like :basic_file_movement
     it_behaves_like :moving_files_in_normal_app
+    it_behaves_like :renaming_file_objects_in_normal_app
 
     it "does copy all files" do
       forker.fork!
@@ -33,8 +34,9 @@ describe ForkRailsProject::Forker do
       described_class.new("orig_app", "forked_app", ["ignore.me"])
     end
 
-    it_behaves_like :moving_basic_files
+    it_behaves_like :basic_file_movement
     it_behaves_like :moving_files_in_normal_app
+    it_behaves_like :renaming_file_objects_in_normal_app
 
     it "does not copy ignored files" do
       forker.fork!
@@ -48,8 +50,9 @@ describe ForkRailsProject::Forker do
       described_class.new("orig_app", "forked_app", ["ignore.me", "tmp"])
     end
 
-    it_behaves_like :moving_basic_files
+    it_behaves_like :basic_file_movement
     it_behaves_like :moving_files_in_normal_app
+    it_behaves_like :renaming_file_objects_in_normal_app
 
     it "does not copy ignored files and folders" do
       forker.fork!
@@ -61,7 +64,7 @@ describe ForkRailsProject::Forker do
   describe "engine fork with no ignored files" do
     let(:forker) { described_class.new("orig_engine", "forked_app") }
 
-    it_behaves_like :moving_basic_files
+    it_behaves_like :basic_file_movement
     it_behaves_like :moving_files_in_engine
     it_behaves_like :renaming_file_objects_in_engine
   end
@@ -72,7 +75,7 @@ describe ForkRailsProject::Forker do
       described_class.new("orig_engine", "forked_app", ["ignore.me"])
     end
 
-    it_behaves_like :moving_basic_files
+    it_behaves_like :basic_file_movement
     it_behaves_like :moving_files_in_engine
     it_behaves_like :renaming_file_objects_in_engine
 
@@ -91,7 +94,7 @@ describe ForkRailsProject::Forker do
 
     # if focus
     # Dir.chdir(TEST_DIR)
-    it_behaves_like :moving_basic_files
+    it_behaves_like :basic_file_movement
     it_behaves_like :moving_files_in_engine
     it_behaves_like :renaming_file_objects_in_engine
 

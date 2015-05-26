@@ -38,11 +38,14 @@ end
 RSpec.configure do |config|
   # uncomment next line for pry output
   config.before(:all) { silence_output }
-  config.before(:each) { Dir.chdir(TEST_DIR) }
+  config.before(:each) do
+    Dir.chdir(TEST_DIR)
+    FileUtils.rm_rf("./forked_app") if File.directory?("./forked_app")
+  end
 
   config.after(:each)  do
     Dir.chdir(TEST_DIR)
-    FileUtils.remove_dir("./forked_app") if File.directory?("./forked_app")
+    FileUtils.rm_rf("./forked_app") if File.directory?("./forked_app")
   end
 
   config.run_all_when_everything_filtered = true
