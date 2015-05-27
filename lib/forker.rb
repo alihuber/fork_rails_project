@@ -46,13 +46,6 @@ module ForkRailsProject
       old_app_name = @source_project_name.camelize
       new_app_name = @dest_project_name.camelize
 
-      # copy and rename folders and files (in that order) in engine first
-      if File.exists?("lib/#{@source_project_name}/engine.rb")
-        copy_and_rename_directories
-        copy_and_rename_files
-        puts
-      end
-
       copy_and_rename_directories
       copy_and_rename_files
       puts
