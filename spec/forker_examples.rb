@@ -74,7 +74,7 @@ shared_examples_for :moving_files_in_engine do
       forker.fork!
 
       file_contents = read_file_contents
-      expect(file_contents.scan(/ForkedApp/).length).to eq 15
+      expect(file_contents.scan(/ForkedApp/).length).to eq 17
     end
   end
 end
@@ -93,7 +93,7 @@ shared_examples_for :renaming_file_objects_in_engine do
       forker.fork!
 
       path_names = read_file_paths
-      expect(path_names.scan(/forked_app/).length).to eq 10
+      expect(path_names.scan(/forked_app/).length).to eq 16
     end
   end
 end
