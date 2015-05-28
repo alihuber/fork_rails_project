@@ -21,7 +21,7 @@ end
 
 shared_examples_for :moving_files_in_normal_app do
   context "altering app name strings" do
-    it "does rename all snake_cased occurrences of original app name "\
+    it "does replace all snake_cased occurrences of original app name "\
        "in forked app" do
       forker.fork!
 
@@ -29,7 +29,7 @@ shared_examples_for :moving_files_in_normal_app do
       expect(file_contents.scan(/forked_app/).length).to eq 6
     end
 
-    it "does rename all CamelCased occurrences of original app name "\
+    it "does replace all CamelCased occurrences of original app name "\
        "in forked app" do
       forker.fork!
 
@@ -61,7 +61,7 @@ end
 
 shared_examples_for :moving_files_in_engine do
   context "altering app name strings" do
-    it "does rename all snake_cased occurrences of original app name "\
+    it "does replace all snake_cased occurrences of original app name "\
        "in forked app" do
       forker.fork!
 
@@ -69,12 +69,20 @@ shared_examples_for :moving_files_in_engine do
       expect(file_contents.scan(/forked_app/).length).to eq 10
     end
 
-    it "does rename all CamelCased occurrences of original app name "\
+    it "does replace all CamelCased occurrences of original app name "\
        "in forked app" do
       forker.fork!
 
       file_contents = read_file_contents
-      expect(file_contents.scan(/ForkedApp/).length).to eq 20
+      expect(file_contents.scan(/ForkedApp/).length).to eq 26
+    end
+
+    it "does replace CamelCased occurrences of original app name "\
+       "in substrings (eg. in another engine name)" do
+      forker.fork!
+
+      file_contents = read_file_contents
+      expect(file_contents).to include "ForkedAppMailer"
     end
   end
 end
@@ -93,7 +101,7 @@ shared_examples_for :renaming_file_objects_in_engine do
       forker.fork!
 
       path_names = read_file_paths
-      expect(path_names.scan(/forked_app/).length).to eq 16
+      expect(path_names.scan(/forked_app/).length).to eq 18
     end
   end
 end
