@@ -66,7 +66,7 @@ shared_examples_for :moving_files_in_engine do
       forker.fork!
 
       file_contents = read_file_contents
-      expect(file_contents.scan(/forked_app/).length).to eq 8
+      expect(file_contents.scan(/forked_app/).length).to eq 10
     end
 
     it "does rename all CamelCased occurrences of original app name "\
@@ -74,7 +74,7 @@ shared_examples_for :moving_files_in_engine do
       forker.fork!
 
       file_contents = read_file_contents
-      expect(file_contents.scan(/ForkedApp/).length).to eq 17
+      expect(file_contents.scan(/ForkedApp/).length).to eq 20
     end
   end
 end
