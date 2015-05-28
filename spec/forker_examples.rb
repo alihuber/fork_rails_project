@@ -26,7 +26,8 @@ shared_examples_for :moving_files_in_normal_app do
       forker.fork!
 
       file_contents = read_file_contents
-      expect(file_contents.scan(/forked_app/).length).to eq 6
+      expect(file_contents.scan(/forked_app/).length).to eq 11
+      expect(file_contents).to include "forked_app_namespaced_api"
     end
 
     it "does replace all CamelCased occurrences of original app name "\
