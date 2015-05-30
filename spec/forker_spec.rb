@@ -10,6 +10,7 @@ describe ForkRailsProject::Forker do
 
   it "does create a new directory with the given name" do
     forker.fork!
+
     expect(File.directory?("../forked_app")).to be_truthy
     expect(Dir.pwd).to eq TEST_DIR + "/forked_app"
   end
@@ -24,6 +25,7 @@ describe ForkRailsProject::Forker do
 
     it "does copy all files" do
       forker.fork!
+
       expect(app_file_count_before).to eql file_count_after
     end
   end
@@ -40,6 +42,7 @@ describe ForkRailsProject::Forker do
 
     it "does not copy ignored files" do
       forker.fork!
+
       expect(file_count_after).to eql app_file_count_before - 1
     end
   end
@@ -56,6 +59,7 @@ describe ForkRailsProject::Forker do
 
     it "does not copy ignored files and folders" do
       forker.fork!
+
       expect(file_count_after).to eql app_file_count_before - 3
     end
   end
@@ -92,14 +96,13 @@ describe ForkRailsProject::Forker do
       described_class.new("orig_engine", "forked_app", ["ignore.me", "tmp"])
     end
 
-    # if focus
-    # Dir.chdir(TEST_DIR)
     it_behaves_like :basic_file_movement
     it_behaves_like :moving_files_in_engine
     it_behaves_like :renaming_file_objects_in_engine
 
     it "does not copy ignored files and folders" do
       forker.fork!
+
       expect(file_count_after).to eql engine_file_count_before - 3
     end
   end
@@ -107,7 +110,6 @@ describe ForkRailsProject::Forker do
 
   # test only applicable if grep output does not match './file_path: occurrence'
   # describe "flawed grep output" do
-  #   Dir.chdir(TEST_DIR)
   #   let(:forker) { described_class.new("orig_app", "forked_app") }
   #   subject { forker.fork! }
 
