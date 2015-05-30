@@ -1,0 +1,13 @@
+# File is named "*.speck" to prevent it from being run by real RSpec tests
+require "spec_helper"
+
+module OrigEngine
+  describe Space::GenericPolicy do
+
+    let(:policy) { described_class.new(object) }
+
+    context "foo set" do
+      specify { expect(policy.foo).to eq "bar" }
+    end
+  end
+end

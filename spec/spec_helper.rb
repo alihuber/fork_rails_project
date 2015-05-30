@@ -36,7 +36,7 @@ end
 
 
 RSpec.configure do |config|
-  # uncomment next line for pry output
+  # comment next line for pry
   config.before(:all) { silence_output }
   config.before(:each) do
     Dir.chdir(TEST_DIR)
