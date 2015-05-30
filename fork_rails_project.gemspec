@@ -3,7 +3,7 @@ $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
   s.name         = "fork_rails_project"
-  s.version      = "0.0.2"
+  s.version      = "0.0.3"
   s.authors      = "Alexander Huber"
   s.email        = "alih83@gmx.de"
   s.homepage     = "https://github.com/alihuber/fork_rails_project"
