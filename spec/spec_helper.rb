@@ -14,6 +14,13 @@ def engine_file_count_before
   count_before
 end
 
+def fancy_app_file_count_before
+  Dir.chdir(TEST_DIR + "/fancy_app")
+  count_before = Dir["**/*"].length
+  Dir.chdir("../")
+  count_before
+end
+
 def file_count_after
   Dir.chdir(TEST_DIR + "/forked_app")
   Dir["**/*"].length
