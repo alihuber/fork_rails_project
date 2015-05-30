@@ -46,5 +46,5 @@ PLATFORMS
 
 DEPENDENCIES
   fork_rails_project!
-  pry
-  rspec
+  pry (~> 0)
+  rspec (~> 3)
