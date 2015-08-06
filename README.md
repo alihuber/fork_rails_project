@@ -16,7 +16,7 @@ gem. It provides a command that takes 2 folder names and an arbitrary list of fi
 
 `fork-rails-project old_app new_app .git tmp`
 
-gives you a copy of `old_app` (with the ".git" and "tmp" files/folders omitted), and a `new app` folder already set up work, meaning that in all files all occurences of the `OldApp` namespace are replaced with `NewApp`, all occurences of the `old_app` project name are replaced with `new_app` and all folders/file paths are moved and renamed accordingly.
+gives you a copy of `old_app` (with the ".git" and "tmp" files/folders omitted), and a `new app` folder already set up to work, meaning that in all files all occurences of the `OldApp` namespace are replaced with `NewApp`, all occurences of the `old_app` project name are replaced with `new_app` and all folders/file paths are moved and renamed accordingly.
 
 This is particularly useful to quickly rename Rails engines that live in their own namespace.
 
